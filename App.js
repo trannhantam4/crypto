@@ -1,20 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import { Dimensions, StyleSheet, View, Text } from "react-native";
+import CryptoPriceTracker from "./components/CryptoPriceTracker";
+const { width, height } = Dimensions.get("window");
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Text style={styles.headers}>CRYPTO TRACKER</Text>
+      <CryptoPriceTracker />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#fff",
+    alignItems: "center",
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  headers: {
+    paddingTop: 100,
+    justifyContent: "flex-start",
+    fontSize: 30,
+    fontWeight: "bold",
   },
 });
