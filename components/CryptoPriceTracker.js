@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, RefreshControl, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  RefreshControl,
+  FlatList,
+  Dimensions,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { LineChart } from "react-native-chart-kit"; // Import LineChart from react-native-chart-kit
 
 const API_URL = "https://api.coingecko.com/api/v3/simple/price";
 const CRYPTO_IDS = ["bitcoin", "ethereum", "usd"];
@@ -10,12 +18,13 @@ const CryptoPriceTracker = () => {
   const [refreshing, setRefreshing] = useState(false);
   const prevCryptoDataRef = useRef([]);
   const [refreshTime, setRefreshTime] = useState(5000);
+  const [priceHistory, setPriceHistory] = useState([]);
 
   useEffect(() => {
     // Initial data fetch
     fetchCryptoData();
 
-    // Set up an interval to refresh every 5 seconds (5000 milliseconds)
+    // Set up an interval to refresh every specified time
     const intervalId = setInterval(() => {
       fetchCryptoData();
     }, refreshTime);
@@ -23,6 +32,16 @@ const CryptoPriceTracker = () => {
     // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, [refreshTime]);
+
+  useEffect(() => {
+    // Add current prices to price history
+    if (cryptoData.length > 0) {
+      setPriceHistory((prev) => [
+        ...prev,
+        cryptoData.map((item) => item[1].usd),
+      ]);
+    }
+  }, [cryptoData]);
 
   const handleRefresh = () => {
     // Set the refreshing state to true to display the loading indicator
@@ -47,10 +66,20 @@ const CryptoPriceTracker = () => {
 
       // Update previousPrice with currentPrice from previous data
       prevCryptoDataRef.current = cryptoData;
-      setCryptoData(data);
+      setCryptoData(Object.entries(data));
     } catch (error) {
       console.error("Error fetching crypto data:", error);
     }
+  };
+
+  const chartData = {
+    labels: priceHistory.map((_, index) => index.toString()),
+    datasets: [
+      {
+        data: priceHistory.flat(),
+        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+      },
+    ],
   };
 
   return (
@@ -83,6 +112,25 @@ const CryptoPriceTracker = () => {
             tintColor="#000"
           />
         }
+      />
+
+      <LineChart
+        data={chartData}
+        width={Dimensions.get("window").width - 16}
+        height={220}
+        chartConfig={{
+          backgroundColor: "white",
+          backgroundGradientFrom: "white",
+          backgroundGradientTo: "white",
+          decimalPlaces: 2,
+          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          style: {
+            borderRadius: 16,
+          },
+        }}
+        bezier
+        style={styles.chart}
       />
     </View>
   );
@@ -123,6 +171,9 @@ const styles = StyleSheet.create({
   cryptoPrice: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  chart: {
+    marginTop: 16,
   },
 });
 
