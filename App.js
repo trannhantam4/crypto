@@ -1,5 +1,6 @@
 import { Dimensions, StyleSheet, View, Text } from "react-native";
 import CryptoPriceTracker from "./components/CryptoPriceTracker";
+import { GlobalStyles } from "./constant/styles";
 const { width, height } = Dimensions.get("window");
 export default function App() {
   return (
@@ -12,7 +13,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: GlobalStyles.colors.primary10,
     alignItems: "center",
     flex: 1,
   },
@@ -21,5 +22,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     fontSize: 30,
     fontWeight: "bold",
+    color: GlobalStyles.colors.primary60,
   },
 });
